@@ -1,0 +1,47 @@
+name: Share Data between Jobs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 第一个作业：生成并上传数据
+  generate-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate sample data
+        run: |
+          # 创建一个包含示例数据的文件
+          mkdir -p data
+          echo "This is some sample data." > data/sample.txt
+          echo "Another line of sample data." >> data/sample.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sample-data
+          path: data
+
+  # 第二个作业：下载并使用数据
+  download-and-use:
+    runs-on: ubuntu-latest
+    # 确保这个作业在 generate-and-upload 作业完成后再运行
+    needs: generate-and-upload
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: sample-data
+          path: downloaded-data
+
+      - name: Use the downloaded data
+        run: |
+          # 打印下载的数据文件内容
+          cat downloaded-data/sample.txt
