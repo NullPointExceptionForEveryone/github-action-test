@@ -3,7 +3,7 @@ name: Share Data between Jobs
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   # 第一个作业：生成并上传数据
